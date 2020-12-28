@@ -3,9 +3,11 @@ package gui;
 import java.io.IOException;
 import java.net.URL;
 import java.util.List;
+import java.util.Optional;
 import java.util.ResourceBundle;
 
 import application.Main;
+import db.DbIntegrityException;
 import gui.listeners.DataChangeListener;
 import gui.util.Alerts;
 import gui.util.Utils;
@@ -17,6 +19,7 @@ import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
 import javafx.scene.control.Button;
+import javafx.scene.control.ButtonType;
 import javafx.scene.control.TableCell;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
@@ -33,6 +36,8 @@ public class DepartmentListController implements Initializable, DataChangeListen
 
 	private DepartmentService service;
 
+	@FXML
+	private TableColumn<Department, Department> tableColumnRemove;
 	@FXML
 	private TableColumn<Department, Department> tableColumnEdit;
 	@FXML
@@ -64,6 +69,24 @@ public class DepartmentListController implements Initializable, DataChangeListen
 			}
 		});
 
+	}
+
+	private void initRemoveButtons() {
+		tableColumnRemove.setCellValueFactory(param -> new ReadOnlyObjectWrapper<>(param.getValue()));
+		tableColumnRemove.setCellFactory(param -> new TableCell<Department, Department>() {
+			private final Button button = new Button("remove");
+
+			@Override
+			protected void updateItem(Department obj, boolean empty) {
+				super.updateItem(obj, empty);
+				if (obj == null) {
+					setGraphic(null);
+					return;
+				}
+				setGraphic(button);
+				button.setOnAction(event -> removeEntity(obj));
+			}
+		});
 	}
 
 	@FXML
@@ -98,6 +121,7 @@ public class DepartmentListController implements Initializable, DataChangeListen
 		obsList = FXCollections.observableArrayList(list);
 		tableViewDpt.setItems(obsList);
 		initEditButtons();
+		initRemoveButtons();
 	}
 
 	private void createDialogForm(Department obj, String a, Stage parentStage) {
@@ -118,9 +142,25 @@ public class DepartmentListController implements Initializable, DataChangeListen
 			dialogStage.initOwner(parentStage);
 			dialogStage.initModality(Modality.WINDOW_MODAL);
 			dialogStage.showAndWait();
-		} 
-		catch (IOException e) {
+		} catch (IOException e) {
 			Alerts.showAlert("IO Exception", "Error loading View", e.getMessage(), AlertType.ERROR);
+		}
+	}
+	private void removeEntity(Department obj) {
+		Optional<ButtonType> result = Alerts.showConfirmation("Confirmation", "Certeza ?");
+		
+		if(result.get()==ButtonType.OK) {
+			if (service == null) {
+				throw new IllegalStateException("Service was null");
+			}
+			try {
+				service.remove(obj);
+				updateTableView();
+			}
+			catch (DbIntegrityException e) {
+				Alerts.showAlert("Error removing", null, e.getMessage(), AlertType.ERROR);
+			}
+			
 		}
 	}
 
