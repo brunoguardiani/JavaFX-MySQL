@@ -137,26 +137,26 @@ public class SellerListController implements Initializable, DataChangeListener {
 	}
 
 	private void createDialogForm(Seller obj, String a, Stage parentStage) {
-//		try {
-//			FXMLLoader loader = new FXMLLoader(getClass().getResource(a));
-//			Pane pane = loader.load();
-//
-//			SellerFormController controller = loader.getController();
-//			controller.setSeller(obj);
-//			controller.setService(new SellerService());
-//			controller.subDataChangeListener(this);
-//			controller.updateFormData();
-//
-//			Stage dialogStage = new Stage();
-//			dialogStage.setTitle("Enter department data");
-//			dialogStage.setScene(new Scene(pane));
-//			dialogStage.setResizable(false);
-//			dialogStage.initOwner(parentStage);
-//			dialogStage.initModality(Modality.WINDOW_MODAL);
-//			dialogStage.showAndWait();
-//		} catch (IOException e) {
-//			Alerts.showAlert("IO Exception", "Error loading View", e.getMessage(), AlertType.ERROR);
-//		}
+		try {
+			FXMLLoader loader = new FXMLLoader(getClass().getResource(a));
+			Pane pane = loader.load();
+
+			SellerFormController controller = loader.getController();
+			controller.setSeller(obj);
+			controller.setService(new SellerService());
+			controller.subDataChangeListener(this);
+			controller.updateFormData();
+
+			Stage dialogStage = new Stage();
+			dialogStage.setTitle("Enter department data");
+			dialogStage.setScene(new Scene(pane));
+			dialogStage.setResizable(false);
+			dialogStage.initOwner(parentStage);
+			dialogStage.initModality(Modality.WINDOW_MODAL);
+			dialogStage.showAndWait();
+		} catch (IOException e) {
+			Alerts.showAlert("IO Exception", "Error loading View", e.getMessage(), AlertType.ERROR);
+		}
 	}
 	private void removeEntity(Seller obj) {
 		Optional<ButtonType> result = Alerts.showConfirmation("Confirmation", "Certeza ?");
