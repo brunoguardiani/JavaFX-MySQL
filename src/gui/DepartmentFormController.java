@@ -1,9 +1,12 @@
 package gui;
 
 import java.net.URL;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.ResourceBundle;
 
 import db.DbException;
+import gui.listeners.DataChangeListener;
 import gui.util.Alerts;
 import gui.util.Constraints;
 import gui.util.Utils;
@@ -19,6 +22,7 @@ import model.services.DepartmentService;
 
 public class DepartmentFormController implements Initializable {
 	
+	private List<DataChangeListener> dataChangeListeners = new ArrayList<>();
 	private Department entity;
 	private DepartmentService service;
 	@FXML
@@ -44,6 +48,10 @@ public class DepartmentFormController implements Initializable {
 		this.entity=entity;
 	}
 	
+	public void subDataChangeListener (DataChangeListener listener) {
+		dataChangeListeners.add(listener);
+	}
+	
 	public void updateFormData() {
 		if(entity == null) {
 			throw new IllegalStateException("Entidade era nula.");
@@ -63,12 +71,19 @@ public class DepartmentFormController implements Initializable {
 		try {
 			entity = getFormData();
 			service.saveOrUpdate(entity);
+			notifyDataChangeListeners();
 			Utils.currentStage(event).close();
 		}
 		catch (DbException e) {
 			Alerts.showAlert("Error saving object", null, e.getMessage(), AlertType.ERROR);
 		}
 	}
+	private void notifyDataChangeListeners() {
+		for(DataChangeListener listener : dataChangeListeners) {
+			listener.onDataChange();
+		}
+	}
+
 	private Department getFormData() {
 		Department obj = new Department();
 		obj.setId(Utils.tryParseToInt(txtFieldId.getText()));
@@ -90,5 +105,4 @@ public class DepartmentFormController implements Initializable {
 		Constraints.setTextFieldInteger(txtFieldId);
 		Constraints.setTextFieldMaxLength(txtFieldName, 10);
 	}
-
 }
