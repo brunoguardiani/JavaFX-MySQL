@@ -1,8 +1,11 @@
 package gui;
 
 import java.net.URL;
+import java.time.LocalDate;
+import java.time.ZoneId;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 import java.util.ResourceBundle;
 import java.util.Set;
@@ -16,6 +19,7 @@ import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.control.Button;
+import javafx.scene.control.DatePicker;
 import javafx.scene.control.Label;
 import javafx.scene.control.TextField;
 import javafx.scene.control.Alert.AlertType;
@@ -37,7 +41,20 @@ public class SellerFormController implements Initializable {
 	@FXML
 	private TextField txtFieldName; 
 	@FXML
+	private TextField txtFieldEmail;
+	@FXML
+	private TextField txtFieldBSalary; 
+	@FXML
+	private DatePicker dpBDate;
+	@FXML
 	private Label labelError;
+	@FXML
+	private Label labelErrorEmail;
+	@FXML
+	private Label labelErrorBDate;
+	@FXML
+	private Label labelErrorBSalary;
+	
 	
 	public SellerService getService() {
 		return service;
@@ -60,7 +77,12 @@ public class SellerFormController implements Initializable {
 			throw new IllegalStateException("Entidade era nula.");
 		}
 		txtFieldId.setText(String.valueOf(entity.getId()));
-		txtFieldName.setText(String.valueOf(entity.getName()));
+		txtFieldName.setText(entity.getName());
+		txtFieldEmail.setText(entity.getEmail());
+		Locale.setDefault(Locale.US);
+		txtFieldBSalary.setText(String.format("%.2f", entity.getBaseSalary()));
+		if(entity.getBirthDate()!=null)
+		dpBDate.setValue(LocalDate.ofInstant(entity.getBirthDate().toInstant(), ZoneId.systemDefault()));
 	}
 	
 	@FXML
@@ -129,5 +151,8 @@ public class SellerFormController implements Initializable {
 	private void initializeNodes() {
 		Constraints.setTextFieldInteger(txtFieldId);
 		Constraints.setTextFieldMaxLength(txtFieldName, 10);
+		Constraints.setTextFieldDouble(txtFieldBSalary);
+		Constraints.setTextFieldMaxLength(txtFieldEmail, 50);
+		Utils.formatDatePicker(dpBDate, "dd/MM/yyyy");
 	}
 }
