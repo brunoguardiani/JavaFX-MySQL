@@ -1,9 +1,11 @@
 package gui;
 
 import java.net.URL;
+import java.time.Instant;
 import java.time.LocalDate;
 import java.time.ZoneId;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
@@ -141,11 +143,38 @@ public class SellerFormController implements Initializable {
 		ValidationException exception = new ValidationException("Validation Name Exception: ");
 		obj.setId(Utils.tryParseToInt(txtFieldId.getText()));
 
-		if (txtFieldName == null || txtFieldName.getText().trim().equals("")) {
+		if (txtFieldName.getText() == null || txtFieldName.getText().trim().equals("")) {
 			exception.addErrors("name", "Campo obrigatório");
 		}
 
 		obj.setName(txtFieldName.getText());
+		
+		if (txtFieldEmail.getText() == null || txtFieldEmail.getText().trim().equals("")) {
+			exception.addErrors("email", "Campo obrigatório");
+		}
+
+		obj.setEmail(txtFieldEmail.getText());
+
+		if(dpBDate.getValue()==null) {
+			exception.addErrors("birthDate", "Campo obrigatório");
+		}
+		else {
+			Instant instant = Instant.from(dpBDate.getValue().atStartOfDay(ZoneId.systemDefault()));
+			obj.setBirthDate(Date.from(instant));
+		}
+		
+		
+		if (txtFieldBSalary.getText()== null || txtFieldBSalary.getText().trim().equals("")) {
+			exception.addErrors("baseSalary", "Campo obrigatório");
+		}
+
+		obj.setBaseSalary(Utils.tryParseToDouble(txtFieldBSalary.getText()));
+		
+		if(comboBox.getValue()==null) {
+			throw new NullPointerException ("Campo obrigatório");
+		}
+		else
+		obj.setDepartment(comboBox.getValue());
 
 		if (exception.getErrors().size() > 0) {
 			throw exception;
@@ -160,6 +189,16 @@ public class SellerFormController implements Initializable {
 		if (fields.contains("name")) {
 			labelError.setText(errors.get("name"));
 		}
+		if (fields.contains("email")) {
+			labelErrorEmail.setText(errors.get("email"));
+		}
+		if (fields.contains("baseSalary")) {
+			labelErrorBSalary.setText(errors.get("baseSalary"));
+		}
+		if (fields.contains("birthDate")) {
+			labelErrorBDate.setText(errors.get("birthDate"));
+		}
+		
 	}
 
 	public void onBtCancelAction(ActionEvent event) {
